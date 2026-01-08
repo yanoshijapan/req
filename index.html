@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Apapun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .custom-input {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .custom-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #818cf8;
+            outline: none;
+            ring: 2px;
+        }
+        /* Custom SweetAlert Style */
+        .swal2-popup {
+            border-radius: 20px !important;
+            background: #1e293b !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="glass-card w-full max-w-md p-10 animate__animated animate__zoomIn">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold tracking-tight mb-2">Mau Request Apa?</h1>
+            <p class="text-slate-400 text-sm">Isi kolom dibawah ini</p>
+        </header>
+
+        <form id="requestForm" class="space-y-8">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-slate-300 ml-1">Request + detailnya</label>
+                <textarea 
+                    id="message" 
+                    name="text"
+                    required
+                    rows="4" 
+                    class="w-full p-4 rounded-2xl custom-input resize-none placeholder-slate-500"
+                    placeholder="Tolong buatin ..., isinya ada ... & ..."></textarea>
+            </div>
+
+            <button 
+                type="submit" 
+                id="submitBtn"
+                class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-xl shadow-indigo-500/20">
+                Kirim Request
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE APP SCRIPT ANDA DI SINI
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxQMVF52qJeo5cbsFwnVUJSfvNwc0uKBwMbqx_y2byOjZuW5izHY2TnbesP1921cU0n_g/exec';
+        
+        const form = document.getElementById('requestForm');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+
+            // 1. Tampilkan Popup Loading (Donat Berputar)
+            Swal.fire({
+                title: 'Mengirim Request...',
+                html: 'Tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(); // Ini akan memunculkan spinner donat default
+                }
+            });
+
+            // 2. Kirim Data ke Google Sheets
+            fetch(scriptURL, { 
+                method: 'POST', 
+                body: new FormData(form),
+                mode: 'no-cors' 
+            })
+            .then(() => {
+                // 3. Ubah Loading menjadi Centang (Success)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Done!',
+                    text: 'Request udah diterima',
+                    timer: 2500,
+                    showConfirmButton: false,
+                    timerProgressBar: true
+                });
+                
+                form.reset(); // Kosongkan form
+            })
+            .catch(error => {
+                // Tampilkan pesan error jika gagal
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Waduh!',
+                    text: 'Terjadi kesalahan saat mengirim data.',
+                    confirmButtonColor: '#6366f1'
+                });
+                console.error('Error!', error.message);
+            });
+        });
+    </script>
+</body>
+</html>
